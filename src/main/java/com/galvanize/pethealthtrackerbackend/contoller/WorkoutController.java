@@ -5,6 +5,8 @@ import com.galvanize.pethealthtrackerbackend.models.Workout;
 import com.galvanize.pethealthtrackerbackend.repository.PetRepository;
 import com.galvanize.pethealthtrackerbackend.repository.WorkoutRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -19,6 +21,7 @@ public class WorkoutController {
     PetRepository petRepository;
 
     /************************     GET Mapping      ************************/
+
 
     // all pets
     @GetMapping("/pets")
@@ -73,6 +76,7 @@ public class WorkoutController {
 
     /************************     POST Mapping      ************************/
 
+
     // add 1 pet
     @PostMapping("/add_pet")
     public Pet addPet(@RequestBody Pet pet) {
@@ -97,45 +101,62 @@ public class WorkoutController {
         return this.workoutRepository.insert(workouts);
     }
 
-    /************************     PUT Mapping     ************************/
+    /************************     PUT Mapping     *************************/
+
 
     // gets Workout object from frontend and updates the corresponding
     // db element to reflect any changes
     @PutMapping("/workouts/{id}")
-    public Workout updateWorkout(@PathVariable String id, @RequestBody Workout updates) {
-        return this.workoutRepository.findById(id).map(workout -> {
-            workout.setType(updates.getType());
-            workout.setDateTime(updates.getDateTime());
-            workout.setIntensity(updates.getIntensity());
-            workout.setCaloriesBurned(updates.getCaloriesBurned());
-            workout.setDistance(updates.getDistance());
-            workout.setWorkoutDuration(updates.getWorkoutDuration());
-            workout.setPet(updates.getPet());
-            return this.workoutRepository.save(workout);
-        }).get();
+    public ResponseEntity<Workout> updateWorkout(@PathVariable String id, @RequestBody Workout updates) {
+        Optional<Workout> updatedWorkout = this.workoutRepository.findById(id);
+
+        if (updatedWorkout.isPresent()) {
+            updatedWorkout.map(workout -> {
+                workout.setType(updates.getType());
+                workout.setDateTime(updates.getDateTime());
+                workout.setIntensity(updates.getIntensity());
+                workout.setCaloriesBurned(updates.getCaloriesBurned());
+                workout.setDistance(updates.getDistance());
+                workout.setWorkoutDuration(updates.getWorkoutDuration());
+                workout.setPet(updates.getPet());
+                return this.workoutRepository.save(workout);
+            });
+            return ResponseEntity.ok(updatedWorkout.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+
     }
 
     // gets Pet object from frontend and updates the corresponding
     // db element to reflect any changes
     // also updates any Workout that reference this pet to reflect updates
     @PutMapping("/pets/{id}")
-    public Pet updatePet(@PathVariable String id, @RequestBody Pet updates) {
-        Pet updatedPet = this.petRepository.findById(id).map(pet -> {
-            pet.setName(updates.getName());
-            pet.setSize(updates.getSize());
-            return this.petRepository.save(pet);
-        }).get();
+    public ResponseEntity<Pet> updatePet(@PathVariable String id, @RequestBody Pet updates) {
+        Optional<Pet> updatedPet = this.petRepository.findById(id);
 
-        this.workoutRepository.findByPetId(updatedPet.getId()).stream()
-                .forEach(workout -> {
-                    workout.setPet(updatedPet);
-                    this.workoutRepository.save(workout);
-                });
+        if (updatedPet.isPresent()) {
+            updatedPet.map(pet -> {
+                pet.setName(updates.getName());
+                pet.setSize(updates.getSize());
+                return this.petRepository.save(pet);
+            });
 
-        return updatedPet;
+            this.workoutRepository.findByPetId(updatedPet.get().getId()).stream()
+                    .forEach(workout -> {
+                        workout.setPet(updatedPet.get());
+                        this.workoutRepository.save(workout);
+                    });
+
+            return ResponseEntity.ok(updatedPet.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
 
     /************************     DELETE Mapping      ************************/
+
 
     // remove one pet by id
     @DeleteMapping("/remove_pet/{id}")
