@@ -6,6 +6,7 @@ import com.galvanize.pethealthtrackerbackend.repository.PetRepository;
 import com.galvanize.pethealthtrackerbackend.repository.WorkoutRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,15 +25,15 @@ public class WorkoutController {
 
 
     // all pets
-    @GetMapping("/pets")
-    public List<Pet> getAllPets() {
+    @GetMapping(value = "/pets", produces = "application/json")
+    public @ResponseBody List<Pet> getAllPets() {
         return this.petRepository.findAll();
     }
 
     // all workouts
     // can add query for workouts by type
     @GetMapping("/workouts")
-    public List<Workout> getAllWorkouts(@RequestParam(required = false) String type) {
+    public @ResponseBody List<Workout> getAllWorkouts(@RequestParam(required = false) String type) {
         if (type != null) {
             return this.workoutRepository.findByType(type);
         } else {

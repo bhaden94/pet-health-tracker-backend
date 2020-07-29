@@ -10,6 +10,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Document(collection = "workouts")
 @Getter
@@ -25,7 +26,7 @@ public class Workout {
 
    @JsonProperty("date_time")
    @NonNull
-   private LocalDateTime dateTime;
+   private Date dateTime;
 
    @NonNull
    private int intensity;           // 1-3, low-high
