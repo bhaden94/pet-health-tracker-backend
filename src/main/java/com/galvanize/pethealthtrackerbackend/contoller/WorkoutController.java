@@ -6,7 +6,6 @@ import com.galvanize.pethealthtrackerbackend.repository.PetRepository;
 import com.galvanize.pethealthtrackerbackend.repository.WorkoutRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,7 +49,9 @@ public class WorkoutController {
     // all workouts for a pet by id
     @GetMapping("/workouts/pet/{id}")
     public List<Workout> findByPetId(@PathVariable String id) {
-        return this.workoutRepository.findByPetId(id);
+        List<Workout> workouts = this.workoutRepository.findByPetId(id);
+        Collections.sort(workouts);
+        return workouts;
     }
 
     // get total distance ran/walked by a certain pet id
@@ -144,7 +145,8 @@ public class WorkoutController {
                 return this.petRepository.save(pet);
             });
 
-            this.workoutRepository.findByPetId(updatedPet.get().getId()).stream()
+            this.workoutRepository.findByPetId(updatedPet.get().getId())
+                    .stream()
                     .forEach(workout -> {
                         workout.setPet(updatedPet.get());
                         this.workoutRepository.save(workout);

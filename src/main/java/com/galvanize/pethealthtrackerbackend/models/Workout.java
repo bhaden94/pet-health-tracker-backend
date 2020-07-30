@@ -17,7 +17,7 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @ToString
-public class Workout {
+public class Workout implements Comparable<Workout> {
 
    @Id
    private String id;
@@ -42,5 +42,10 @@ public class Workout {
 
    @NonNull
    private Pet pet;
+
+   @Override
+   public int compareTo(Workout o) {
+      return getDateTime().compareTo(o.getDateTime());
+   }
 
 }

@@ -1,6 +1,7 @@
 package com.galvanize.pethealthtrackerbackend.repository;
 
 import com.galvanize.pethealthtrackerbackend.models.Workout;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
