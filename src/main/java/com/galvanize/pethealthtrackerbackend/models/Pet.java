@@ -1,5 +1,6 @@
 package com.galvanize.pethealthtrackerbackend.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -19,6 +20,9 @@ public class Pet {
 
     @NonNull
     private String size; // small, medium, large, extra-large
+
+    @JsonProperty("picture_url")
+    private String pictureUrl;
 
 
 }
